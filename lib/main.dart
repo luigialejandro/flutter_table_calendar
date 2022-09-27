@@ -12,11 +12,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'Customized calendar',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Customized calendar'),
     );
   }
 }
@@ -31,18 +31,61 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  CalendarFormat format = CalendarFormat.month;
+
+  DateTime selectedDay = DateTime.now();
+  DateTime focusedDay = DateTime.now();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        centerTitle: true,
       ),
       body: SafeArea(
-        child: TableCalendar(
-          firstDay: DateTime.utc(2022, 03, 01),
-          lastDay: DateTime.utc(2023, 03, 31),
-          focusedDay: DateTime.now(),
-        ),
+        child: SingleChildScrollView(
+            child: Column(
+          children: [
+            TableCalendar(
+                firstDay: DateTime.utc(2022, 03, 01),
+                lastDay: DateTime.utc(2023, 03, 31),
+                focusedDay: selectedDay, //focusedDay
+                headerVisible: true,
+                daysOfWeekVisible: true,
+                //shouldFillViewport: true,
+                calendarFormat: format,
+                onFormatChanged: (CalendarFormat _format) {
+                  setState(() {
+                    format = _format;
+                  });
+                },
+                startingDayOfWeek: StartingDayOfWeek.monday,
+                onDaySelected: (DateTime focusDay, DateTime selectDay) {
+                  setState(() {
+                    selectedDay = selectDay;
+                    focusedDay = focusDay;
+                  });
+                },
+                calendarStyle: CalendarStyle(
+                  isTodayHighlighted: true,
+                  selectedDecoration: BoxDecoration(
+                    color: Colors.blue,
+                    shape: BoxShape.circle,
+                  ),
+                  selectedTextStyle: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+                selectedDayPredicate: (DateTime date) {
+                  return isSameDay(selectedDay, date);
+                }),
+            SizedBox(height: 5),
+            Container(
+              child: Text(''),
+            )
+          ],
+        )),
       ),
     );
   }
